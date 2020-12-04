@@ -40,12 +40,15 @@ type windowsSystem struct{}
 func (windowsSystem) String() string {
 	return version
 }
+
 func (windowsSystem) Detect() bool {
 	return true
 }
+
 func (windowsSystem) Interactive() bool {
 	return interactive
 }
+
 func (windowsSystem) New(i Interface, c *Config) (Service, error) {
 	ws := &windowsService{
 		i:      i,
@@ -132,7 +135,7 @@ var interactive = false
 
 func init() {
 	var err error
-	interactive, err = svc.IsAnInteractiveSession()
+	interactive, err = svc.IsWindowsService()
 	if err != nil {
 		panic(err)
 	}
@@ -154,6 +157,7 @@ func (ws *windowsService) setError(err error) {
 	defer ws.errSync.Unlock()
 	ws.stopStartErr = err
 }
+
 func (ws *windowsService) getError() error {
 	ws.errSync.Lock()
 	defer ws.errSync.Unlock()
@@ -442,6 +446,7 @@ func (ws *windowsService) Logger(errs chan<- error) (Logger, error) {
 	}
 	return ws.SystemLogger(errs)
 }
+
 func (ws *windowsService) SystemLogger(errs chan<- error) (Logger, error) {
 	el, err := eventlog.Open(ws.Name)
 	if err != nil {
